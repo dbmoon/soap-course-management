@@ -7,15 +7,22 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.ws.config.annotation.EnableWs;
+import org.springframework.ws.config.annotation.WsConfigurerAdapter;
+import org.springframework.ws.server.EndpointInterceptor;
+import org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor;
+import org.springframework.ws.soap.security.xwss.callback.SimplePasswordValidationCallbackHandler;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
 import org.springframework.xml.xsd.XsdSchema;
 
+import java.util.Collections;
+import java.util.List;
+
 @Configuration
 @EnableWs
 @ComponentScan("com.in28minutes.service")
-public class WebServiceConfig {
+public class WebServiceConfig extends WsConfigurerAdapter {
 
     //DispatcherServlet --> Front Controller, first processes controller
     //AppCOntent
@@ -46,8 +53,31 @@ public class WebServiceConfig {
     }
 
     @Bean
-    public XsdSchema  coursesSchema(){
+    public XsdSchema coursesSchema(){
         return new SimpleXsdSchema(new ClassPathResource("course-details.xsd"));
+    }
+
+    //XwsSewcurityInterceptor
+    //Callback Handler --> check id and password
+    //ListOfInterceptor
+    @Bean
+    public XwsSecurityInterceptor securityInterceptor(){
+        XwsSecurityInterceptor securityInterceptor = new XwsSecurityInterceptor();
+        securityInterceptor.setCallbackHandler(callBackHandler());
+        securityInterceptor.setPolicyConfiguration(new ClassPathResource("securityPolicy.xml"));
+        return securityInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(List<EndpointInterceptor> interceptors){
+        interceptors.add(securityInterceptor());
+    }
+
+    @Bean
+    private SimplePasswordValidationCallbackHandler callBackHandler(){
+        SimplePasswordValidationCallbackHandler simplePasswordValidationCallbackHandler = new SimplePasswordValidationCallbackHandler();
+        simplePasswordValidationCallbackHandler.setUsersMap(Collections.singletonMap("user", "password"));
+        return simplePasswordValidationCallbackHandler;
     }
 
 }

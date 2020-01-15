@@ -1,4 +1,11 @@
 package com.in28minutes.soap.webservices.soapcoursemanagement.soap.exception;
 
-public class CourseNotFoundException {
+import org.springframework.ws.soap.server.endpoint.annotation.FaultCode;
+import org.springframework.ws.soap.server.endpoint.annotation.SoapFault;
+
+@SoapFault(faultCode = FaultCode.CUSTOM, customFaultCode = "{http://in28minutes.com/courses}001_CODE_NOT_FOUND")
+public class CourseNotFoundException extends RuntimeException{
+    public CourseNotFoundException(String message){
+        super(message);
+    }
 }
