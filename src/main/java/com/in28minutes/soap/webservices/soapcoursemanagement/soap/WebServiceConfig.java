@@ -74,7 +74,7 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     }
 
     @Bean
-    private SimplePasswordValidationCallbackHandler callBackHandler(){
+    public SimplePasswordValidationCallbackHandler callBackHandler(){
         SimplePasswordValidationCallbackHandler simplePasswordValidationCallbackHandler = new SimplePasswordValidationCallbackHandler();
         simplePasswordValidationCallbackHandler.setUsersMap(Collections.singletonMap("user", "password"));
         return simplePasswordValidationCallbackHandler;
